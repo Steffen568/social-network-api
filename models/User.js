@@ -1,4 +1,4 @@
-const { Schema, model } = require('mongoose');
+const { Schema, model, trusted } = require('mongoose');
 
 // User Model
 const UserSchema = new Schema({
@@ -12,15 +12,28 @@ const UserSchema = new Schema({
         type: String,
         unique: true,
         required: true,
-        validatate: {
-            validator: validator.isEmail,
-            message: `{VALUE} is not a valid eamil`,
-            isAsync: false
-        }
+        match: [/.+\@.+\..+/]
     },
-    thoughts: [],
-    friends: []
-})
+    thoughts: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: "Thoughts"
+        }
+    ],
+    friends: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: "User"
+        }
+    ]
+},
+    {
+        toJSON: {
+            virtuals: true
+        },
+        id: false
+    }
+);
 
 
 // create User model using userSchema
@@ -28,7 +41,7 @@ const User = model('User', UserSchema)
 
 // create virtual to get total count of comments and replies 
 UserSchema.virtual('friendCount').get(function() {
-    return this.friends.reduce((total, friends) => total + friends.length +1, 0)
+    return this.friends.length
 })
 
 // export User model
