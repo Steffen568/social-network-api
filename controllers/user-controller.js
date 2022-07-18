@@ -1,5 +1,6 @@
-const { User } = require('../models')
+const { User } = require('../models/User')
 // const db = require('../models/User')
+const { model } = require('mongoose')
 
 
 const userController = {
